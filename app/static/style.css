@@ -1,0 +1,22 @@
+:root { color-scheme: light; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #1d2939; background: #f2f4f7; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+.container { width: min(100% - 32px, 1040px); margin: 48px auto; }
+header, .table-heading, form { display: flex; align-items: center; gap: 16px; }
+header { justify-content: space-between; margin-bottom: 24px; }
+h1 { margin: 4px 0; font-size: clamp(28px, 5vw, 44px); }
+h2 { margin-top: 0; }
+.eyebrow { color: #175cd3; font-weight: 700; letter-spacing: .12em; }
+.status, .source { border-radius: 999px; padding: 6px 10px; background: #e4e7ec; font-size: 13px; white-space: nowrap; }
+.status.connected { color: #027a48; background: #ecfdf3; }
+.card { background: white; border: 1px solid #eaecf0; border-radius: 16px; padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 14px #1018280d; }
+input { flex: 1; min-width: 120px; border: 1px solid #d0d5dd; border-radius: 8px; padding: 12px; font: inherit; }
+button { border: 0; border-radius: 8px; padding: 12px 18px; color: white; background: #175cd3; font: inherit; font-weight: 700; cursor: pointer; }
+.table-heading { justify-content: space-between; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eaecf0; }
+th { color: #475467; background: #f9fafb; font-size: 13px; }
+#form-message { min-height: 1.5em; color: #175cd3; }
+@media (max-width: 600px) { header, form { align-items: stretch; flex-direction: column; } .status { align-self: flex-start; } }
+

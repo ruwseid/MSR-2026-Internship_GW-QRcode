@@ -1,0 +1,6 @@
+■ライブラリインストール
+uv sync
+
+
+■Pythonプロジェクト実行
+uv run uvicorn app.main:app --reload

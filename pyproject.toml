@@ -1,0 +1,28 @@
+[project]
+name = "internship-qr-sample"
+version = "0.1.0"
+description = "インターンシップ向け QR コード受付サンプル"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.116.0,<1.0.0",
+    "jinja2>=3.1.6,<4.0.0",
+    "opencv-python>=4.12.0.88,<5.0.0",
+    "python-multipart>=0.0.20,<1.0.0",
+    # SSEにはWebSocket用の追加パッケージが不要なので、最小構成のuvicornを使います。
+    "uvicorn>=0.35.0,<1.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1,<1.0.0",
+    "pytest>=8.4.1,<9.0.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.uv]
+# キャッシュとプロジェクトが別ドライブでも動くよう、ハードリンクではなくコピーします。
+link-mode = "copy"
