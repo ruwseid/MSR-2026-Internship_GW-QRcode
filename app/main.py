@@ -1,5 +1,4 @@
 """FastAPIアプリケーションの入口です。"""
-
 import asyncio
 import json
 import logging
@@ -91,3 +90,14 @@ async def events() -> StreamingResponse:
 
     return StreamingResponse(event_stream(), media_type="text/event-stream")
 
+@app.get("/", response_class=HTMLResponse)
+async def index(request: Request):
+    hour_counts, hourly_history = store.get_hourly_stats()
+    return templates.TemplateResponse(
+        request=request,
+        name="index.html",
+        context={
+            "records": store.list_records(),
+            "hourly_history": hourly_history,
+        },
+    )
