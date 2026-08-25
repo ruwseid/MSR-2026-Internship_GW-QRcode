@@ -69,7 +69,7 @@
       <h2>時間帯別アクセスランキング (TOP 3)</h2>
       <ul>
         {% for hour, cnt in top_hours %}
-        <li><strong>第{{ loop.index }}位:</strong> {{ hour }}時台 — {{ cnt }} 回件</li>
+        <li><strong>第{{ loop.index }}位:</strong> {{ hour }}時台 — {{ cnt }} 件</li>
         {% else %}
         <li>まだデータがありません。</li>
         {% endfor %}
@@ -82,43 +82,66 @@
       <div style="position: relative; height: 300px; width: 100%;">
         <canvas id="hourlyChart"></canvas>
       </div>
+    </section>
 
-      <section class="card">
-        <div class="table-heading">
-          <h2>読取履歴</h2>
-          <span><strong id="record-count">{{ records|length }}</strong> 件</span>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>QRコード内容</th>
-                <th>読取日時</th>
-                <th>登録元</th>
-              </tr>
-            </thead>
-            <tbody id="record-body">
-              {% for record in records %}
-              <tr>
-                <td>{{ record.id }}</td>
-                <td>{{ record.qr_text }}</td>
-                <td>{{ record.read_at }}</td>
-                <td><span class="source">{{ record.source }}</span></td>
-              </tr>
-              {% else %}
-              <tr id="empty-row">
-                <td colspan="4">まだ読取データがありません。</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </section>
+    <section class="card">
+      <div class="table-heading">
+        <h2>読取履歴</h2>
+        <span><strong id="record-count">{{ records|length }}</strong> 件</span>
+      </div>
+
+      <form id="history-filters">
+        <label for="sort-by">並べ替え項目</label>
+        <select id="sort-by" name="sort_by">
+          <option value="read_at">読取日時</option>
+          <option value="id">ID</option>
+        </select>
+
+        <label for="sort-order">並び順</label>
+        <select id="sort-order" name="order">
+          <option value="desc">新しい順・大きい順</option>
+          <option value="asc">古い順・小さい順</option>
+        </select>
+
+        <label for="source-filter">登録元</label>
+        <select id="source-filter" name="source">
+          <option value="all">すべて</option>
+          <option value="camera">カメラ</option>
+          <option value="manual">手動</option>
+        </select>
+      </form>
+      <p id="filter-message" aria-live="polite"></p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>QRコード内容</th>
+              <th>読取日時</th>
+              <th>登録元</th>
+            </tr>
+          </thead>
+          <tbody id="record-body">
+            {% for record in records %}
+            <tr>
+              <td>{{ record.id }}</td>
+              <td>{{ record.qr_text }}</td>
+              <td>{{ record.read_at }}</td>
+              <td><span class="source">{{ record.source }}</span></td>
+            </tr>
+            {% else %}
+            <tr id="empty-row">
+              <td colspan="4">まだ読取データがありません。</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
   </main>
   <script>
-    // 引用符 "" で囲むことでJavaScriptの文法エラーを回避します
-    const hourlyData = JSON.parse('{{ hourly_history | tojson }}');
+    const hourlyData = {{ hourly_history | tojson }};
     const labels = Array.from({ length: 24 }, (_, i) => `${i}時`);
 
     const ctx = document.getElementById('hourlyChart').getContext('2d');

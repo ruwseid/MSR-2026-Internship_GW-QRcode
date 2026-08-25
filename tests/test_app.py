@@ -61,10 +61,18 @@ def test_index_page_is_displayed() -> None:
     # lifespanを起動しない書き方にして、テスト時は実カメラへ接続しません。
     client = TestClient(app)
     response = client.get("/")
+    root_get_routes = [
+        route
+        for route in app.routes
+        if getattr(route, "path", None) == "/"
+        and "GET" in (getattr(route, "methods", None) or set())
+    ]
 
     assert response.status_code == 200
+    assert len(root_get_routes) == 1
     assert "QRコード受付" in response.text
     assert 'id="history-filters"' in response.text
+    assert 'id="hourlyChart"' in response.text
 
 
 def test_camera_scanner_survives_opencv_error() -> None:
