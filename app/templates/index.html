@@ -71,6 +71,28 @@
         </span>
       </div>
 
+      <form id="history-filters">
+        <label for="sort-by">並べ替え項目</label>
+        <select id="sort-by" name="sort_by">
+          <option value="read_at">読取日時</option>
+          <option value="id">ID</option>
+        </select>
+
+        <label for="sort-order">並び順</label>
+        <select id="sort-order" name="order">
+          <option value="desc">新しい順・大きい順</option>
+          <option value="asc">古い順・小さい順</option>
+        </select>
+
+        <label for="source-filter">登録元</label>
+        <select id="source-filter" name="source">
+          <option value="all">すべて</option>
+          <option value="camera">カメラ</option>
+          <option value="manual">手動</option>
+        </select>
+      </form>
+      <p id="filter-message" aria-live="polite"></p>
+
       <div class="table-wrap">
         <table>
           <thead>

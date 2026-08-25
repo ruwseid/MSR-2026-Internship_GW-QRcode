@@ -7,6 +7,7 @@ import csv
 import threading
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from typing import Literal
 
 from app.models import Record
 
@@ -15,6 +16,10 @@ CSV_COLUMNS = ["id", "qr_text", "read_at", "source"]
 # ZoneInfo("Asia/Tokyo")はWindowsで別途tzdataが必要になるため、
 # この最小構成サンプルでは標準ライブラリだけで表現できる固定オフセットを使います。
 JST = timezone(timedelta(hours=9), name="JST")
+
+SortField = Literal["id", "read_at"]
+SortOrder = Literal["asc", "desc"]
+SourceFilter = Literal["all", "camera", "manual"]
 
 
 class CsvStore:
@@ -36,12 +41,27 @@ class CsvStore:
             with self.path.open("w", newline="", encoding="utf-8-sig") as file:
                 csv.DictWriter(file, fieldnames=CSV_COLUMNS).writeheader()
 
-    def list_records(self) -> list[Record]:
-        """画面表示用に全件を新しい順で返します。"""
+    def list_records(
+        self,
+        sort_by: SortField = "read_at",
+        order: SortOrder = "desc",
+        source: SourceFilter = "all",
+    ) -> list[Record]:
+        """画面表示用に絞り込み・並べ替え済みの履歴を返します。"""
         with self._lock:
             with self.path.open("r", newline="", encoding="utf-8-sig") as file:
                 records = [Record(**row) for row in csv.DictReader(file)]
-        return list(reversed(records))
+
+        if source != "all":
+            records = [record for record in records if record.source == source]
+
+        if sort_by == "id":
+            sort_key = lambda record: record.id
+        else:
+            # 同一秒に複数登録された場合も、IDを使って順序を確定します。
+            sort_key = lambda record: (datetime.fromisoformat(record.read_at), record.id)
+
+        return sorted(records, key=sort_key, reverse=order == "desc")
 
     def add_record(self, qr_text: str, source: str) -> Record:
         """CSVの末尾へ1件追加し、追加したデータを返します。"""

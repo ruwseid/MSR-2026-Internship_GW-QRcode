@@ -18,6 +18,45 @@ def test_csv_store_add_and_list(tmp_path: Path) -> None:
     assert store.list_records()[0].qr_text == "TEST-001"
 
 
+def test_csv_store_filters_and_sorts_records(tmp_path: Path) -> None:
+    store = CsvStore(tmp_path / "records.csv")
+    store.add_record("CAMERA-001", "camera")
+    store.add_record("MANUAL-001", "manual")
+    store.add_record("CAMERA-002", "camera")
+
+    newest_records = store.list_records()
+    manual_records = store.list_records(source="manual")
+    camera_records = store.list_records(sort_by="id", order="asc", source="camera")
+
+    assert [record.id for record in newest_records] == [3, 2, 1]
+    assert [record.qr_text for record in manual_records] == ["MANUAL-001"]
+    assert [record.id for record in camera_records] == [1, 3]
+
+
+def test_records_api_applies_query_parameters(tmp_path: Path) -> None:
+    store = CsvStore(tmp_path / "records.csv")
+    store.add_record("CAMERA-001", "camera")
+    store.add_record("MANUAL-001", "manual")
+    client = TestClient(app)
+
+    with patch("app.main.store", store):
+        response = client.get(
+            "/api/records",
+            params={"sort_by": "id", "order": "asc", "source": "manual"},
+        )
+
+    assert response.status_code == 200
+    assert [record["qr_text"] for record in response.json()] == ["MANUAL-001"]
+
+
+def test_records_api_rejects_invalid_query_parameter() -> None:
+    client = TestClient(app)
+
+    response = client.get("/api/records", params={"sort_by": "unknown"})
+
+    assert response.status_code == 422
+
+
 def test_index_page_is_displayed() -> None:
     # lifespanを起動しない書き方にして、テスト時は実カメラへ接続しません。
     client = TestClient(app)
@@ -25,6 +64,7 @@ def test_index_page_is_displayed() -> None:
 
     assert response.status_code == 200
     assert "QRコード受付" in response.text
+    assert 'id="history-filters"' in response.text
 
 
 def test_camera_scanner_survives_opencv_error() -> None:
