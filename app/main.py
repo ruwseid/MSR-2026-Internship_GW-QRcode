@@ -3,6 +3,7 @@ import asyncio
 import json
 import logging
 from contextlib import asynccontextmanager
+from typing import Literal
 
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, StreamingResponse
@@ -65,9 +66,13 @@ async def index(request: Request):
 
 
 @app.get("/api/records", response_model=list[Record])
-async def list_records() -> list[Record]:
-    """発展課題でJavaScriptから再読込するときに使えるAPIです。"""
-    return store.list_records()
+async def list_records(
+    sort_by: Literal["id", "read_at"] = "read_at",
+    order: Literal["asc", "desc"] = "desc",
+    source: Literal["all", "camera", "manual"] = "all",
+) -> list[Record]:
+    """指定された条件で絞り込み・並べ替えた読取履歴を返します。"""
+    return store.list_records(sort_by=sort_by, order=order, source=source)
 
 
 @app.post("/api/records", response_model=Record, status_code=201)
