@@ -6,52 +6,106 @@
   <title>QRコード受付</title>
   <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
 </head>
+
 <body>
   <main class="container">
+
     <header>
       <div>
         <p class="eyebrow">INTERNSHIP SAMPLE</p>
         <h1>QRコード受付</h1>
         <p>カメラで読み取った内容をCSVに保存し、一覧へ表示します。</p>
       </div>
-      <span id="connection-status" class="status">接続中...</span>
+
+      <div class="header-actions">
+        <span id="connection-status" class="status">接続中...</span>
+
+        <button
+          id="theme-toggle"
+          class="theme-toggle"
+          type="button"
+          role="switch"
+          aria-checked="false"
+          aria-label="ダークモード切り替え"
+        >
+          <span class="toggle-track">
+            <span class="toggle-thumb"></span>
+          </span>
+          <span class="toggle-label">ダークモード</span>
+        </button>
+
+      </div>
     </header>
+
 
     <section class="card">
       <h2>動作確認用の手動登録</h2>
-      <p>カメラがないPCでは、文字を入力して同じ保存・通知処理を確認できます。</p>
+
+      <p>
+        カメラがないPCでは、文字を入力して同じ保存・通知処理を確認できます。
+      </p>
+
       <form id="manual-form">
-        <input id="qr-text" name="qr_text" maxlength="500" required placeholder="例: STUDENT-001">
-        <button type="submit">登録する</button>
+        <input
+          id="qr-text"
+          name="qr_text"
+          maxlength="500"
+          required
+          placeholder="例: STUDENT-001"
+        >
+
+        <button type="submit">
+          登録する
+        </button>
       </form>
+
       <p id="form-message" aria-live="polite"></p>
     </section>
+
 
     <section class="card">
       <div class="table-heading">
         <h2>読取履歴</h2>
-        <span><strong id="record-count">{{ records|length }}</strong> 件</span>
+        <span>
+          <strong id="record-count">{{ records|length }}</strong> 件
+        </span>
       </div>
+
       <div class="table-wrap">
         <table>
-          <thead><tr><th>ID</th><th>QRコード内容</th><th>読取日時</th><th>登録元</th></tr></thead>
-          <tbody id="record-body">
-          {% for record in records %}
+          <thead>
             <tr>
-              <td>{{ record.id }}</td>
-              <td>{{ record.qr_text }}</td>
-              <td>{{ record.read_at }}</td>
-              <td><span class="source">{{ record.source }}</span></td>
+              <th>ID</th>
+              <th>QRコード内容</th>
+              <th>読取日時</th>
+              <th>登録元</th>
             </tr>
-          {% else %}
-            <tr id="empty-row"><td colspan="4">まだ読取データがありません。</td></tr>
-          {% endfor %}
+          </thead>
+
+          <tbody id="record-body">
+            {% for record in records %}
+              <tr>
+                <td>{{ record.id }}</td>
+                <td>{{ record.qr_text }}</td>
+                <td>{{ record.read_at }}</td>
+                <td>
+                  <span class="source">{{ record.source }}</span>
+                </td>
+              </tr>
+            {% else %}
+              <tr id="empty-row">
+                <td colspan="4">
+                  まだ読取データがありません。
+                </td>
+              </tr>
+            {% endfor %}
           </tbody>
         </table>
       </div>
     </section>
+
   </main>
+
   <script src="{{ url_for('static', path='/app.js') }}"></script>
 </body>
 </html>
-
