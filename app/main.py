@@ -121,3 +121,21 @@ async def index(request: Request):
             "top_hours": top_hours,
         },
     )
+
+@app.get("/", response_class=HTMLResponse)
+async def index(request: Request):
+    """CSVを読み、Jinja2テンプレートへ渡して一覧画面を作ります。"""
+    # 1. CsvStore から集計データを取得
+    hour_counts, hourly_history = store.get_hourly_stats()
+    top_hours = hour_counts.most_common(3)
+
+    # 2. context に hourly_history と top_hours を渡す
+    return templates.TemplateResponse(
+    "index.html",
+    {
+        "request": request,
+        "hourly_history": hourly_history,  # <--- このキーを追加・確認
+        # その他の変数...
+    }
+)
+
