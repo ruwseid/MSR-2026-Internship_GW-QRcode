@@ -1,22 +1,362 @@
-:root { color-scheme: light; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #1d2939; background: #f2f4f7; }
-* { box-sizing: border-box; }
-body { margin: 0; }
-.container { width: min(100% - 32px, 1040px); margin: 48px auto; }
-header, .table-heading, form { display: flex; align-items: center; gap: 16px; }
-header { justify-content: space-between; margin-bottom: 24px; }
-h1 { margin: 4px 0; font-size: clamp(28px, 5vw, 44px); }
-h2 { margin-top: 0; }
-.eyebrow { color: #175cd3; font-weight: 700; letter-spacing: .12em; }
-.status, .source { border-radius: 999px; padding: 6px 10px; background: #e4e7ec; font-size: 13px; white-space: nowrap; }
-.status.connected { color: #027a48; background: #ecfdf3; }
-.card { background: white; border: 1px solid #eaecf0; border-radius: 16px; padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 14px #1018280d; }
-input { flex: 1; min-width: 120px; border: 1px solid #d0d5dd; border-radius: 8px; padding: 12px; font: inherit; }
-button { border: 0; border-radius: 8px; padding: 12px 18px; color: white; background: #175cd3; font: inherit; font-weight: 700; cursor: pointer; }
-.table-heading { justify-content: space-between; }
-.table-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; }
-th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eaecf0; }
-th { color: #475467; background: #f9fafb; font-size: 13px; }
-#form-message { min-height: 1.5em; color: #175cd3; }
-@media (max-width: 600px) { header, form { align-items: stretch; flex-direction: column; } .status { align-self: flex-start; } }
+/* ========================================
+   基本設定
+======================================== */
 
+:root {
+  color-scheme: light;
+
+  --text-color: #1d2939;
+  --background-color: #f2f4f7;
+
+  --card-color: #ffffff;
+  --border-color: #eaecf0;
+
+  --input-color: #ffffff;
+  --input-border-color: #d0d5dd;
+
+  --table-header-color: #f9fafb;
+  --table-text-color: #475467;
+
+  --button-color: #175cd3;
+
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+
+/* ========================================
+   ダークモード
+======================================== */
+
+body.dark {
+  color-scheme: dark;
+
+  --text-color: #f2f4f7;
+  --background-color: #101828;
+
+  --card-color: #1d2939;
+  --border-color: #344054;
+
+  --input-color: #101828;
+  --input-border-color: #475467;
+
+  --table-header-color: #344054;
+  --table-text-color: #d0d5dd;
+
+  --button-color: #2e90fa;
+}
+
+
+/* ========================================
+   共通
+======================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  color: var(--text-color);
+  background: var(--background-color);
+}
+
+html {
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+}
+
+
+/* ========================================
+   レイアウト
+======================================== */
+
+.container {
+  width: min(100% - 32px, 1040px);
+  margin: 48px auto;
+}
+
+header,
+.table-heading,
+form {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+header {
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+
+/* ========================================
+   見出し
+======================================== */
+
+h1 {
+  margin: 4px 0;
+  font-size: clamp(28px, 5vw, 44px);
+}
+
+h2 {
+  margin-top: 0;
+}
+
+.eyebrow {
+  color: #175cd3;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+
+/* ========================================
+   ステータス・登録元
+======================================== */
+
+.status,
+.source {
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: #e4e7ec;
+  color: #1d2939;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+
+.status.connected {
+  color: #027a48;
+  background: #ecfdf3;
+}
+
+
+/* ========================================
+   カード
+======================================== */
+
+.card {
+  background: var(--card-color);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+
+  box-shadow: 0 4px 14px #1018280d;
+
+  transition:
+    background-color 0.3s,
+    border-color 0.3s;
+}
+
+
+/* ========================================
+   入力欄
+======================================== */
+
+input {
+  flex: 1;
+  min-width: 120px;
+
+  border: 1px solid var(--input-border-color);
+  border-radius: 8px;
+
+  padding: 12px;
+
+  font: inherit;
+
+  color: var(--text-color);
+  background: var(--input-color);
+}
+
+
+/* ========================================
+   ボタン
+======================================== */
+
+/* ========================================
+   ボタン
+======================================== */
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+
+/* ========================================
+   ダークモード トグルスイッチ
+======================================== */
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  border: 0;
+  padding: 0;
+
+  color: var(--text-color);
+  background: transparent;
+
+  font-weight: 700;
+}
+
+.theme-toggle:hover {
+  opacity: 1;
+}
+
+
+/* スイッチ本体 */
+
+.toggle-track {
+  position: relative;
+
+  display: inline-block;
+
+  width: 52px;
+  height: 30px;
+
+  border-radius: 999px;
+
+  background: #d0d5dd;
+
+  transition: background-color 0.25s;
+}
+
+
+/* 丸い部分 */
+
+.toggle-thumb {
+  position: absolute;
+
+  top: 3px;
+  left: 3px;
+
+  width: 24px;
+  height: 24px;
+
+  border-radius: 50%;
+
+  background: #ffffff;
+
+  box-shadow: 0 2px 4px #10182833;
+
+  transition: transform 0.25s;
+}
+
+
+/* ダークモードON */
+
+body.dark .toggle-track {
+  background: #175cd3;
+}
+
+body.dark .toggle-thumb {
+  transform: translateX(22px);
+}
+
+
+/* ========================================
+   スマホ対応
+======================================== */
+
+@media (max-width: 600px) {
+  header,
+  form {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .header-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .status {
+    align-self: flex-start;
+  }
+
+  .theme-toggle {
+    align-self: flex-start;
+  }
+}
+
+
+
+/* ========================================
+   テーブル
+======================================== */
+
+.table-heading {
+  justify-content: space-between;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 12px;
+  text-align: left;
+
+  border-bottom: 1px solid var(--border-color);
+}
+
+th {
+  color: var(--table-text-color);
+  background: var(--table-header-color);
+  font-size: 13px;
+}
+
+
+/* ========================================
+   メッセージ
+======================================== */
+
+#form-message {
+  min-height: 1.5em;
+  color: #175cd3;
+}
+
+
+/* ========================================
+   スマホ対応
+======================================== */
+
+@media (max-width: 600px) {
+  header,
+  form {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .header-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .status {
+    align-self: flex-start;
+  }
+
+  #theme-toggle {
+    width: 100%;
+  }
+}

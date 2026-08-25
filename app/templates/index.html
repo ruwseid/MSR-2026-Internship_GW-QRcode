@@ -11,22 +11,56 @@
 
 <body>
   <main class="container">
+
     <header>
       <div>
         <p class="eyebrow">INTERNSHIP SAMPLE</p>
         <h1>QRコード受付</h1>
         <p>カメラで読み取った内容をCSVに保存し、一覧へ表示します。</p>
       </div>
-      <span id="connection-status" class="status">接続中...</span>
+
+      <div class="header-actions">
+        <span id="connection-status" class="status">接続中...</span>
+
+        <button
+          id="theme-toggle"
+          class="theme-toggle"
+          type="button"
+          role="switch"
+          aria-checked="false"
+          aria-label="ダークモード切り替え"
+        >
+          <span class="toggle-track">
+            <span class="toggle-thumb"></span>
+          </span>
+          <span class="toggle-label">ダークモード</span>
+        </button>
+
+      </div>
     </header>
+
 
     <section class="card">
       <h2>動作確認用の手動登録</h2>
-      <p>カメラがないPCでは、文字を入力して同じ保存・通知処理を確認できます。</p>
+
+      <p>
+        カメラがないPCでは、文字を入力して同じ保存・通知処理を確認できます。
+      </p>
+
       <form id="manual-form">
-        <input id="qr-text" name="qr_text" maxlength="500" required placeholder="例: STUDENT-001">
-        <button type="submit">登録する</button>
+        <input
+          id="qr-text"
+          name="qr_text"
+          maxlength="500"
+          required
+          placeholder="例: STUDENT-001"
+        >
+
+        <button type="submit">
+          登録する
+        </button>
       </form>
+
       <p id="form-message" aria-live="polite"></p>
     </section>
 
