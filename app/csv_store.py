@@ -4,6 +4,8 @@
 """
 
 import csv
+from datetime import datetime, time
+from collections import Counter
 import threading
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -85,3 +87,25 @@ class CsvStore:
                 writer = csv.DictWriter(file, fieldnames=CSV_COLUMNS)
                 writer.writerow(record.model_dump())
         return record
+
+    def get_sorted_read_times(self) -> list[time]:
+        """read_at 列から時刻(timeオブジェクト)を抽出し、昇順ソートして返します。"""
+        with self._lock:
+            with self.path.open("r", newline="", encoding="utf-8-sig") as file:
+                reader = csv.DictReader(file)
+                times = []
+                for row in reader:
+                    # 1. ISOフォーマット文字列から datetime オブジェクトへ変換
+                    dt = datetime.fromisoformat(row["read_at"])
+                    # 2. time オブジェクト（時刻部分）を取り出してリストに追加
+                    times.append(dt.time())
+        
+        # 3. time 配列を昇順ソート
+        times.sort()
+        return times
+
+    def get_hourly_stats(self):
+        times = self.get_sorted_read_times()
+        hour_counts = Counter([t.hour for t in times])
+        hourly_history = [hour_counts[h] for h in range(24)]
+        return hour_counts, hourly_history

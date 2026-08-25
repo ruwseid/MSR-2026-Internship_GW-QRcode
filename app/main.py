@@ -1,5 +1,4 @@
 """FastAPIアプリケーションの入口です。"""
-
 import asyncio
 import json
 import logging
@@ -95,3 +94,35 @@ async def events() -> StreamingResponse:
             yield f"data: {data}\n\n"
 
     return StreamingResponse(event_stream(), media_type="text/event-stream")
+
+@app.get("/", response_class=HTMLResponse)
+async def index(request: Request):
+    hour_counts, hourly_history = store.get_hourly_stats()
+    return templates.TemplateResponse(
+        request=request,
+        name="index.html",
+        context={
+            "records": store.list_records(),
+            "hourly_history": hourly_history,
+        },
+    )
+
+# app/main.py
+
+@app.get("/", response_class=HTMLResponse)
+async def index(request: Request):
+    """CSVを読み、Jinja2テンプレートへ渡して一覧画面を作ります。"""
+    hour_counts, hourly_history = store.get_hourly_stats()
+    
+    # 時間帯ランキング TOP3 を作成 (例: [(14, 23), (9, 15), (10, 8)])
+    top_hours = hour_counts.most_common(3)
+
+    return templates.TemplateResponse(
+        request=request,
+        name="index.html",
+        context={
+            "records": store.list_records(),
+            "hourly_history": hourly_history,
+            "top_hours": top_hours,
+        },
+    )
