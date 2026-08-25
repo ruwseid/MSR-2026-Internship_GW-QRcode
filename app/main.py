@@ -3,6 +3,7 @@ import asyncio
 import json
 import logging
 from contextlib import asynccontextmanager
+from typing import Literal
 
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, StreamingResponse
@@ -57,17 +58,26 @@ app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     """CSVを読み、Jinja2テンプレートへ渡して一覧画面を作ります。"""
+    hour_counts, hourly_history = store.get_hourly_stats()
     return templates.TemplateResponse(
         request=request,
         name="index.html",
-        context={"records": store.list_records()},
+        context={
+            "records": store.list_records(),
+            "hourly_history": hourly_history,
+            "top_hours": hour_counts.most_common(3),
+        },
     )
 
 
 @app.get("/api/records", response_model=list[Record])
-async def list_records() -> list[Record]:
-    """発展課題でJavaScriptから再読込するときに使えるAPIです。"""
-    return store.list_records()
+async def list_records(
+    sort_by: Literal["id", "read_at"] = "read_at",
+    order: Literal["asc", "desc"] = "desc",
+    source: Literal["all", "camera", "manual"] = "all",
+) -> list[Record]:
+    """指定された条件で絞り込み・並べ替えた読取履歴を返します。"""
+    return store.list_records(sort_by=sort_by, order=order, source=source)
 
 
 @app.post("/api/records", response_model=Record, status_code=201)
@@ -89,53 +99,3 @@ async def events() -> StreamingResponse:
             yield f"data: {data}\n\n"
 
     return StreamingResponse(event_stream(), media_type="text/event-stream")
-
-@app.get("/", response_class=HTMLResponse)
-async def index(request: Request):
-    hour_counts, hourly_history = store.get_hourly_stats()
-    return templates.TemplateResponse(
-        request=request,
-        name="index.html",
-        context={
-            "records": store.list_records(),
-            "hourly_history": hourly_history,
-        },
-    )
-
-# app/main.py
-
-@app.get("/", response_class=HTMLResponse)
-async def index(request: Request):
-    """CSVを読み、Jinja2テンプレートへ渡して一覧画面を作ります。"""
-    hour_counts, hourly_history = store.get_hourly_stats()
-    
-    # 時間帯ランキング TOP3 を作成 (例: [(14, 23), (9, 15), (10, 8)])
-    top_hours = hour_counts.most_common(3)
-
-    return templates.TemplateResponse(
-        request=request,
-        name="index.html",
-        context={
-            "records": store.list_records(),
-            "hourly_history": hourly_history,
-            "top_hours": top_hours,
-        },
-    )
-
-@app.get("/", response_class=HTMLResponse)
-async def index(request: Request):
-    """CSVを読み、Jinja2テンプレートへ渡して一覧画面を作ります。"""
-    # 1. CsvStore から集計データを取得
-    hour_counts, hourly_history = store.get_hourly_stats()
-    top_hours = hour_counts.most_common(3)
-
-    # 2. context に hourly_history と top_hours を渡す
-    return templates.TemplateResponse(
-    "index.html",
-    {
-        "request": request,
-        "hourly_history": hourly_history,  # <--- このキーを追加・確認
-        # その他の変数...
-    }
-)
-
